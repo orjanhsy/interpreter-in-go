@@ -11,6 +11,9 @@ const (
 	ILLEGAL = "ILLEGAL"
 	EOF     = "EOF"
 
+	EQ     = "=="
+	NOT_EQ = "!="
+
 	// identifiers + literals
 	IDENT = "IDENT" // add, foobar, x, y ...
 	INT   = "INT"   // 1343456
