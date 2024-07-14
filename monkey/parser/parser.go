@@ -1,6 +1,7 @@
 package parser
 
 import (
+	"fmt"
 	"monkey/ast"
 	"monkey/lexer"
 	"monkey/token"
@@ -16,8 +17,8 @@ type Parser struct {
 func New(l *lexer.Lexer) *Parser {
 	p := &Parser{l: l}
 
-	p.l.NextToken()
-	p.l.NextToken()
+	p.nextToken()
+	p.nextToken()
 
 	return p
 }
@@ -34,6 +35,7 @@ func (p *Parser) ParseProgram() *ast.Program {
 	for p.curToken.Type != token.EOF {
 		stmt := p.parseStatement()
 		if stmt != nil {
+			fmt.Printf("Statement %s added \n", stmt.TokenLiteral())
 			program.Statements = append(program.Statements, stmt)
 		}
 		p.nextToken()
@@ -48,5 +50,43 @@ func (p *Parser) parseStatement() ast.Statement {
 		return p.parseLetStatement()
 	default:
 		return nil
+	}
+}
+
+func (p *Parser) parseLetStatement() *ast.LetStatement {
+	stmt := &ast.LetStatement{Token: p.curToken}
+
+	if !p.expectPeek(token.IDENT) {
+		return nil
+	}
+	stmt.Name = &ast.Identifier{Token: p.curToken, Value: p.curToken.Literal}
+
+	if !p.expectPeek(token.ASSIGN) {
+		return nil
+	}
+
+	// TODO: We're skipping the expressions until we
+	// encounter a semicolon
+	for !p.curTokenIs(token.SEMICOLON) {
+		p.nextToken()
+	}
+
+	return stmt
+}
+
+func (p *Parser) curTokenIs(t token.TokenType) bool {
+	return p.curToken.Type == t
+}
+
+func (p *Parser) peekTokenIs(t token.TokenType) bool {
+	return p.peekToken.Type == t
+}
+
+func (p *Parser) expectPeek(t token.TokenType) bool {
+	if p.peekTokenIs(t) {
+		p.nextToken()
+		return true
+	} else {
+		return false
 	}
 }
