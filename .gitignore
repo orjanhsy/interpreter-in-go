@@ -20,3 +20,6 @@
 # Go workspace file
 go.work
 go.work.sum
+
+# project book
+writing_an_interpreter_in_go_1.7/
